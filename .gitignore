@@ -1,0 +1,191 @@
+# ============================================================
+#  Django + React + ML — Smart Load Forecasting Project
+# ============================================================
+
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+wheels/
+
+
+# ── Virtual environments ─────────────────────────────────────
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+
+# ── Django ───────────────────────────────────────────────────
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/mediafiles/
+
+# Django migrations (keep these — they track DB schema)
+# Do NOT add migrations/ here
+
+
+# ── Environment variables & secrets ──────────────────────────
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+.env.staging
+secrets.json
+secrets.yaml
+config/local.py
+
+
+# ── ML models & large data files ─────────────────────────────
+# Model weights (large binary files — use DVC or cloud storage)
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.joblib
+*.pt
+*.pth
+*.onnx
+*.pb
+*.tflite
+*.bin
+
+# Data files (use DVC or share via Google Drive / S3)
+data/raw/
+data/processed/
+*.csv
+*.parquet
+*.feather
+*.npy
+*.npz
+*.json.gz
+
+# Jupyter notebooks (optional — uncomment if you don't want them)
+# *.ipynb
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+
+# ── React / Node.js ──────────────────────────────────────────
+frontend/node_modules/
+node_modules/
+frontend/build/
+frontend/dist/
+frontend/.next/
+frontend/out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/install-state.gz
+
+
+# ── IDE & editor files ───────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+
+# ── OS files ─────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+
+# ── Testing & coverage ───────────────────────────────────────
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.pytest_cache/
+.hypothesis/
+
+
+# ── Celery ───────────────────────────────────────────────────
+celerybeat-schedule
+celerybeat-schedule.*
+celerybeat.pid
+
+
+# ── Redis ────────────────────────────────────────────────────
+dump.rdb
+
+
+# ── Docker ───────────────────────────────────────────────────
+.dockerignore
+docker-compose.override.yml
+
+
+# ── Logs ─────────────────────────────────────────────────────
+logs/
+*.log
+*.log.*
+
+
+# ── Static & media (generated at deploy time) ────────────────
+/static/
+/media/
+
+
+# ── Production & deployment ──────────────────────────────────
+.vercel
+.netlify
+*.pem
+*.key
+*.crt
+*.csr
+Procfile.local
+
+
+# ── Temporary files ──────────────────────────────────────────
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+*.orig
