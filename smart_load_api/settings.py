@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,9 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
 
 
-    'accounts',
+    'accounts.apps.AccountsConfig',
     'data_ingestion',
     'forecasting',
     'demand_response',
@@ -141,3 +143,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME':     timedelta(minutes=60),  # 1 hour — reasonable
+    'REFRESH_TOKEN_LIFETIME':    timedelta(days=30),     # 30 days — user stays logged in
+    'ROTATE_REFRESH_TOKENS':     True,    # each refresh gives a new refresh token
+    'BLACKLIST_AFTER_ROTATION':  True,    # old refresh token is invalidated
+}
