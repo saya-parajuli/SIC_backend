@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.contrib.auth import get_user_model
-from .serializers import RegisterSerializer, UserProfileSerializer
+from .serializers import RegisterSerializer, UserProfileSerializer, LoginSerializer
 
 User = get_user_model()
 
@@ -18,6 +18,7 @@ class RegisterView(generics.CreateAPIView):
 
 
 class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
     permission_classes = [permissions.AllowAny]
 
 

@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()   # always use this, never import CustomUser directly
 
@@ -29,3 +30,36 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'first_name', 'last_name', 'full_name',
                   'role', 'organization', 'phone', 'date_joined']
         read_only_fields = ['email', 'role', 'date_joined']
+
+
+class LoginSerializer(TokenObtainPairSerializer):
+    email = serializers.EmailField()
+
+    username_field = "email"
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        user = authenticate(
+            request=self.context.get("request"),
+            username=email,
+            password=password,
+        )
+
+        if not user:
+            raise serializers.ValidationError(
+                "Invalid email or password"
+            )
+
+        refresh = self.get_token(user)
+
+        return {
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user": {
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            },
+        }
