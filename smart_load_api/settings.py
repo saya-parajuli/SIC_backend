@@ -38,15 +38,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third party
     'rest_framework',
-    'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
+    'corsheaders',
 
-
+    # Apps — use full AppConfig path for any app that has signals
     'accounts.apps.AccountsConfig',
     'data_ingestion',
     'forecasting',
-    'demand_response',
+    'demand_response.apps.DemandResponseConfig',
     'analytics',
     'notifications',
 ]
