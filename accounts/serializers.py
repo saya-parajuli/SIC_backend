@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+
 
 User = get_user_model()   # always use this, never import CustomUser directly
 
@@ -64,3 +68,40 @@ class LoginSerializer(TokenObtainPairSerializer):
                 "role": user.role,
             },
         }
+    
+
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        # We intentionally don't raise an error if email doesn't exist
+        # — this prevents user enumeration attacks (attacker can't tell
+        #   which emails are registered)
+        return value
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    uid   = serializers.CharField()      # base64-encoded user pk
+    token = serializers.CharField()      # signed token from email link
+    new_password  = serializers.CharField(min_length=8, write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        if data["new_password"] != data["confirm_password"]:
+            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+
+        # Decode uid → get user
+        try:
+            uid  = force_str(urlsafe_base64_decode(data["uid"]))
+            user = get_user_model().objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, get_user_model().DoesNotExist):
+            raise serializers.ValidationError({"uid": "Invalid reset link."})
+
+        # Validate token
+        if not PasswordResetTokenGenerator().check_token(user, data["token"]):
+            raise serializers.ValidationError({"token": "Reset link is invalid or has expired."})
+
+        data["user"] = user
+        return data

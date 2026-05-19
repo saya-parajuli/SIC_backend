@@ -12,6 +12,16 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+import os
+
+# This will search for a .env file in the current directory or parent directories
+load_dotenv()
+
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG') == 'True'
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +31,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-uy6_brczazminyqw+b*b@!=f_375jktfv85=ypn0l3lg!8!h8n'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = []
 
@@ -66,7 +76,8 @@ MIDDLEWARE = [
 
 
 # Allow React dev server
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
+FRONTEND_URL = os.getenv("FRONTEND_URL", default="http://localhost:5173")
+CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
 
 # JWT authentication
 REST_FRAMEWORK = {
@@ -151,11 +162,20 @@ STATIC_URL = 'static/'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 
-
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME':     timedelta(minutes=60),  # 1 hour — reasonable
     'REFRESH_TOKEN_LIFETIME':    timedelta(days=30),     # 30 days — user stays logged in
     'ROTATE_REFRESH_TOKENS':     True,    # each refresh gives a new refresh token
     'BLACKLIST_AFTER_ROTATION':  True,    # old refresh token is invalidated
 }
+
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hour in seconds — matches the token expiration in ForgotPasswordView
+
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"          # or your SMTP provider
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")  # your email address
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # app password, not your login password
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
