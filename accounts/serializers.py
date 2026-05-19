@@ -1,9 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils.encoding import force_str
-from django.utils.http import urlsafe_base64_decode
+from .models import PasswordResetRequest
 
 
 User = get_user_model()   # always use this, never import CustomUser directly
@@ -83,25 +81,39 @@ class ForgotPasswordSerializer(serializers.Serializer):
 
 
 class ResetPasswordSerializer(serializers.Serializer):
-    uid   = serializers.CharField()      # base64-encoded user pk
-    token = serializers.CharField()      # signed token from email link
-    new_password  = serializers.CharField(min_length=8, write_only=True)
+    reset_token      = serializers.CharField()
+    otp              = serializers.CharField(min_length=6, max_length=6)
+    new_password     = serializers.CharField(min_length=8, write_only=True)
     confirm_password = serializers.CharField(write_only=True)
 
     def validate(self, data):
         if data["new_password"] != data["confirm_password"]:
-            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+            raise serializers.ValidationError(
+                {"confirm_password": "Passwords do not match."}
+            )
 
-        # Decode uid → get user
+        # Look up by opaque token
         try:
-            uid  = force_str(urlsafe_base64_decode(data["uid"]))
-            user = get_user_model().objects.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, get_user_model().DoesNotExist):
-            raise serializers.ValidationError({"uid": "Invalid reset link."})
+            reset_request = PasswordResetRequest.objects.select_related("user").get(
+                reset_token=data["reset_token"],
+                is_used=False,
+            )
+        except PasswordResetRequest.DoesNotExist:
+            raise serializers.ValidationError(
+                {"reset_token": "Invalid or already used reset link."}
+            )
 
-        # Validate token
-        if not PasswordResetTokenGenerator().check_token(user, data["token"]):
-            raise serializers.ValidationError({"token": "Reset link is invalid or has expired."})
+        # Check expiry
+        if reset_request.is_expired():
+            raise serializers.ValidationError(
+                {"reset_token": "This reset link has expired. Please request a new one."}
+            )
 
-        data["user"] = user
+        # Check OTP
+        if reset_request.otp != data["otp"]:
+            raise serializers.ValidationError(
+                {"otp": "Incorrect OTP. Please check your email."}
+            )
+
+        data["reset_request"] = reset_request
         return data

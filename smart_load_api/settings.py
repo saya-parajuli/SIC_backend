@@ -169,7 +169,7 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION':  True,    # old refresh token is invalidated
 }
 
-PASSWORD_RESET_TIMEOUT = 3600  # 1 hour in seconds — matches the token expiration in ForgotPasswordView
+PASSWORD_RESET_TIMEOUT_MINUTES = 15  # for OTP expiration check in PasswordResetRequest model
 
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

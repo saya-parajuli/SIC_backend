@@ -7,7 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.contrib.auth import get_user_model
 from .serializers import RegisterSerializer, UserProfileSerializer, LoginSerializer, ForgotPasswordSerializer, ResetPasswordSerializer
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from .models import PasswordResetRequest
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.core.mail import send_mail
@@ -72,26 +72,32 @@ class ForgotPasswordView(APIView):
     def post(self, request):
         serializer = ForgotPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         email = serializer.validated_data["email"]
 
-        # Always return success — never reveal if email exists or not
         try:
             user = User.objects.get(email=email)
 
-            uid   = urlsafe_base64_encode(force_bytes(user.pk))
-            token = PasswordResetTokenGenerator().make_token(user)
+            # Invalidate any previous unused requests for this user
+            PasswordResetRequest.objects.filter(user=user, is_used=False).delete()
 
-            reset_link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
+            # Create fresh token + OTP
+            reset_request = PasswordResetRequest.objects.create(user=user)
+
+            reset_link = (
+                f"{settings.FRONTEND_URL}/reset-password/{reset_request.reset_token}"
+            )
 
             send_mail(
-                subject="Reset your password",
+                subject="Reset your password — Smart EM",
                 message=(
                     f"Hi {user.first_name or user.email},\n\n"
-                    f"Click the link below to reset your password. "
-                    f"This link expires in 1 hour.\n\n"
-                    f"{reset_link}\n\n"
-                    f"If you didn't request this, ignore this email."
+                    f"We received a request to reset your password.\n\n"
+                    f"1. Click this link to open the reset page:\n"
+                    f"   {reset_link}\n\n"
+                    f"2. Enter this OTP when prompted:\n"
+                    f"   {reset_request.otp}\n\n"
+                    f"This OTP expires in 15 minutes.\n"
+                    f"If you didn't request this, you can safely ignore this email."
                 ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[email],
@@ -99,7 +105,7 @@ class ForgotPasswordView(APIView):
             )
 
         except User.DoesNotExist:
-            pass  # Silently do nothing — same response either way
+            pass  # Same response either way — prevents email enumeration
 
         return Response(
             {"message": "If an account with that email exists, a reset link has been sent."},
@@ -114,9 +120,16 @@ class ResetPasswordView(APIView):
         serializer = ResetPasswordSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = serializer.validated_data["user"]
+        reset_request = serializer.validated_data["reset_request"]
+        user = reset_request.user
+
+        # Update password
         user.set_password(serializer.validated_data["new_password"])
         user.save()
+
+        # Mark token as used — can never be replayed
+        reset_request.is_used = True
+        reset_request.save()
 
         return Response(
             {"message": "Password has been reset successfully."},
