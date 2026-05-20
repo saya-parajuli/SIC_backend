@@ -22,9 +22,9 @@ In simple terms:
 
 | Team Member | Roll No | Responsibility |
 |---|---|---|
-| Member 1 | 079BEL082 | Data collection, preprocessing, Django backend, APIs, authentication |
-| Member 2 | 079BEL083 | AI forecasting model (machine learning) |
-| Member 3 | 079BEL087 | Demand response logic, dashboard (React frontend) |
+| Member 1 | 079BEL087 | Data collection, preprocessing, Django backend, APIs, authentication |
+| Member 2 | 079BEL082 | AI forecasting model (machine learning) |
+| Member 3 | 079BEL083 | Demand response logic, dashboard (React frontend) |
 
 ---
 
@@ -35,7 +35,7 @@ User opens React app
         ↓
 Logs in → Django gives back a secure JWT token
         ↓
-React uses token to call Django APIs
+React uses a token to call Django APIs
         ↓
 Django reads the AI model → returns 24-hour electricity forecast
         ↓
@@ -60,7 +60,7 @@ backend/
 │   ├── models.py            ← CustomUser model
 │   ├── serializers.py       ← data formatting for API responses
 │   ├── views.py             ← register, login, logout, profile APIs
-│   ├── admin.py             ← user management in Django admin panel
+│   ├── admin.py             ← user management in the Django admin panel
 │   ├── signals.py           ← auto-assigns roles (superuser → admin)
 │   └── urls.py              ← /api/auth/...
 │
