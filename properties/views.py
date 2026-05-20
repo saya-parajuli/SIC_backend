@@ -1,9 +1,8 @@
-# properties/views.py
-
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from django.db.models import Q 
 from .models import Property, HomeMember, SmartMeter, EnergyReading, MeterAlert
 from .serializers import (PropertySerializer, HomeMemberSerializer,
                            SmartMeterSerializer, EnergyReadingSerializer,
@@ -101,7 +100,7 @@ class SmartMeterListCreateView(generics.ListCreateAPIView):
             return SmartMeter.objects.all()
 
         accessible_properties = Property.objects.filter(
-            models.Q(owner=user) | models.Q(members__user=user)
+            Q(owner=user) | Q(members__user=user)
         ).distinct()
         return SmartMeter.objects.filter(property__in=accessible_properties)
 
@@ -128,22 +127,38 @@ class OnboardingStatusView(APIView):
     def get(self, request):
         user = request.user
 
-        has_property = Property.objects.filter(owner=user).exists()
+        # Fetch the property directly — we need it for step 2 response
+        property_qs = Property.objects.filter(owner=user)
+        user_property = property_qs.first()
+
+        has_property = user_property is not None
         has_meter    = SmartMeter.objects.filter(
                          property__owner=user, is_active=True
                        ).exists()
 
         if not has_property:
-            step = 1   # needs to add a home
+            step = 1
         elif not has_meter:
-            step = 2   # needs to link a meter
+            step = 2
         else:
-            step = 3   # ready for dashboard
+            step = 3
+
+        # Build property info only if it exists
+        property_data = None
+        if user_property:
+            property_data = {
+                'id':           user_property.id,
+                'name':         user_property.name,
+                'address':      user_property.address_line1,
+                'city':         user_property.city,
+                'tariff_plan':  user_property.tariff_plan,
+            }
 
         return Response({
             'step':         step,
             'has_property': has_property,
             'has_meter':    has_meter,
+            'property':     property_data,   # ← null on step 1, populated on step 2 and 3
             'message': {
                 1: 'Please add your home or property to continue.',
                 2: 'Please link your smart meter to continue.',

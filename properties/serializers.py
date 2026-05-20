@@ -1,5 +1,3 @@
-# properties/serializers.py
-
 from rest_framework import serializers
 from .models import Property, HomeMember, SmartMeter, EnergyReading, MeterAlert
 
