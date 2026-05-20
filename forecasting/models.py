@@ -3,16 +3,16 @@ from django.conf import settings
 
 
 class LoadReading(models.Model):
-    """Stores the seeded historical data from her CSV."""
+    """Seeded historical data from real LCL smart meter CSV files."""
     user        = models.ForeignKey(
                     settings.AUTH_USER_MODEL,
                     on_delete=models.CASCADE,
                     related_name='load_readings',
-                    null=True, blank=True   # null = system-wide data, not per user yet
+                    null=True, blank=True
                   )
     datetime    = models.DateTimeField(db_index=True)
-    load_kw     = models.FloatField()
-    temperature = models.FloatField()
+    load_kwh    = models.FloatField()          # ← renamed from load_kw
+    temperature = models.FloatField(default=0) # not in LCL data, kept for schema compatibility
     hour        = models.IntegerField()
     day_of_week = models.IntegerField()
     is_weekend  = models.BooleanField()
@@ -22,7 +22,7 @@ class LoadReading(models.Model):
         ordering = ['datetime']
 
     def __str__(self):
-        return f"{self.datetime} — {self.load_kw:.2f} kW"
+        return f"{self.datetime} — {self.load_kwh:.4f} kWh"
 
 
 class ForecastResult(models.Model):
@@ -34,12 +34,12 @@ class ForecastResult(models.Model):
                     )
     generated_at  = models.DateTimeField(auto_now_add=True)
     target_hour   = models.DateTimeField()
-    predicted_kw  = models.FloatField()
+    predicted_kwh = models.FloatField()        # ← renamed from predicted_kw
     is_peak       = models.BooleanField(default=False)
-    model_used    = models.CharField(max_length=50)
+    model_used    = models.CharField(max_length=50, default='Random Forest')
 
     class Meta:
         ordering = ['target_hour']
 
     def __str__(self):
-        return f"{self.user.email} | {self.target_hour} | {self.predicted_kw:.2f} kW"
+        return f"{self.user.email} | {self.target_hour} | {self.predicted_kwh:.4f} kWh"

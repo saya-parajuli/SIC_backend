@@ -1,37 +1,23 @@
 {
   "metadata": {
-    "generated_at": "2026-05-11T00:11:06.629674",
     "best_model": "Random Forest",
-    "data_points": 2160
+    "data_source": "LCL real data (4 households)"
   },
   "metrics": {
     "Linear Regression": {
-      "MAE": 18.59877224292712,
-      "RMSE": 22.17342186234291,
-      "R2": 0.49190548532618206,
-      "MAPE": 19.451229871383727
+      "MAE": 9.1372,
+      "R2": 0.6587
     },
     "Random Forest": {
-      "MAE": 5.77125192598604,
-      "RMSE": 7.304768969891938,
-      "R2": 0.9448567908954808,
-      "MAPE": 5.713492261867298
+      "MAE": 5.1006,
+      "R2": 0.8749
     }
   },
-  "peak_info": {
-    "threshold": 141.45564790823258,
-    "max_load": 152.39494075853653,
-    "min_load": 62.15086157471389,
-    "avg_load": 105.28231405676087,
-    "load_factor": 69.08517666841469,
-    "peak_to_avg_ratio": 1.447488518122577,
-    "num_peak_hours": 4,
-    "peak_percentage": 16.666666666666664,
-    "peak_hours_of_day": {
-      "17": 1,
-      "18": 1,
-      "19": 1,
-      "20": 1
-    }
-  }
+  "features": [
+    "hour",
+    "day_of_week",
+    "is_weekend",
+    "month",
+    "rolling_24h_avg"
+  ]
 }
