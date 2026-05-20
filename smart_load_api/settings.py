@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'forecasting',
     'demand_response.apps.DemandResponseConfig',
     'analytics',
+    'properties',
     'notifications',
 ]
 
