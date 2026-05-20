@@ -22,9 +22,9 @@ In simple terms:
 
 | Team Member | Roll No | Responsibility |
 |---|---|---|
-| Member 1 | 079BEL087 | Data collection, preprocessing, Django backend, APIs, authentication |
-| Member 2 | 079BEL082 | AI forecasting model (machine learning) |
-| Member 3 | 079BEL083 | Demand response logic, dashboard (React frontend) |
+| Member 1 | 079BEL087 | Data collection, preprocessing, AI forecasting model (machine learning),Django backend |
+| Member 2 | 079BEL082 | Demand Response Logic, Optimization, Django Backend, Appliance Profile |
+| Member 3 | 079BEL083 | React frontend, APIs, authentication, Django backend |
 
 ---
 
