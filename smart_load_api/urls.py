@@ -17,7 +17,24 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from django.contrib.admin import site as admin_site
+from .admin_views import admin_dashboard
+
+# # Patch the admin site to use your custom index
+# original_get_urls = admin_site.get_urls
+
+# def custom_get_urls():
+#     from django.urls import path
+#     custom = [path('', admin_site.admin_view(admin_dashboard), name='index')]
+#     return custom + original_get_urls()
+
+# admin_site.get_urls = custom_get_urls
+
+# # Override the default admin index with our custom dashboard
+# admin.site.index_template = 'admin/index.html'
+
 urlpatterns = [
+    # path('admin/dashboard/', admin_dashboard, name='admin_dashboard'),
     path('admin/', admin.site.urls),
 
     path('api/auth/',      include('accounts.urls')),
