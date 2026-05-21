@@ -14,6 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import os
+from django.utils.translation import gettext_lazy as _
 
 # This will search for a .env file in the current directory or parent directories
 load_dotenv()
@@ -181,3 +182,153 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")  # your email address
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # app password, not your login password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+
+UNFOLD = {
+
+    # ─────────────────────────────────────────────
+    # SITE
+    # ─────────────────────────────────────────────
+    "SITE_TITLE": "Smart Load DR",
+    "SITE_HEADER": "Smart Load DR Admin",
+    "SITE_SYMBOL": "bolt",
+    
+
+    # ─────────────────────────────────────────────
+    # SIDEBAR
+    # ─────────────────────────────────────────────
+    "SIDEBAR": {
+        "show_search": True,
+
+        "navigation": [
+
+            # DASHBOARD
+            {
+                "title": "Dashboard",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Analytics Dashboard",
+                        "icon": "dashboard",
+                        "link": "/admin/dashboard/",
+                    },
+                ],
+            },
+
+            # ACCOUNTS
+            {
+                "title": "Accounts",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Users",
+                        "icon": "people",
+                        "link": "/admin/accounts/customuser/",
+                    },
+                    {
+                        "title": "Groups",
+                        "icon": "group_work",
+                        "link": "/admin/auth/group/",
+                    },
+                ],
+            },
+
+            # PROPERTIES
+            {
+                "title": "Properties",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Properties",
+                        "icon": "home",
+                        "link": "/admin/properties/property/",
+                    },
+                    {
+                        "title": "Smart Meters",
+                        "icon": "speed",
+                        "link": "/admin/properties/smartmeter/",
+                    },
+                    {
+                        "title": "Home Members",
+                        "icon": "family_restroom",
+                        "link": "/admin/properties/homemember/",
+                    },
+                    {
+                        "title": "Energy Readings",
+                        "icon": "electric_bolt",
+                        "link": "/admin/properties/energyreading/",
+                    },
+                ],
+            },
+
+            # FORECASTING
+            {
+                "title": "Forecasting",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Load Readings",
+                        "icon": "query_stats",
+                        "link": "/admin/forecasting/loadreading/",
+                    },
+                    {
+                        "title": "Forecast Results",
+                        "icon": "monitoring",
+                        "link": "/admin/forecasting/forecastresult/",
+                    },
+                ],
+            },
+
+            # DEMAND RESPONSE
+            {
+                "title": "Demand Response",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Appliance Profiles",
+                        "icon": "devices",
+                        "link": "/admin/demand_response/applianceprofile/",
+                    },
+                    {
+                        "title": "DR Results",
+                        "icon": "savings",
+                        "link": "/admin/demand_response/drresult/",
+                    },
+                    {
+                        "title": "Peak Events",
+                        "icon": "warning",
+                        "link": "/admin/demand_response/peakevent/",
+                    },
+                ],
+            },
+
+            # ANALYTICS
+            {
+                "title": "Analytics",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Reports",
+                        "icon": "analytics",
+                        "link": "/admin/analytics/",
+                    },
+                ],
+            },
+
+            # NOTIFICATIONS
+            {
+                "title": "Notifications",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Notifications",
+                        "icon": "notifications",
+                        "link": "/admin/notifications/",
+                    },
+                ],
+            },
+        ],
+    },
+}

@@ -1,6 +1,7 @@
 import json
 from datetime import date, timedelta
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import admin
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.db.models import Sum, Count, Avg
@@ -21,14 +22,14 @@ def admin_dashboard(request):
     total_users      = User.objects.filter(is_active=True).count()
     total_meters     = SmartMeter.objects.filter(is_active=True).count()
     total_properties = Property.objects.filter(is_active=True).count()
-    # active_alerts    = PeakEvent.objects.filter(is_resolved=False).count()
+    active_alerts    = PeakEvent.objects.filter(is_resolved=False).count()
 
-    # dr_agg = DRResult.objects.aggregate(
-    #     total_savings=Sum('cost_saving_gbp'),
-    #     total_co2=Sum('carbon_reduced_kg'),
-    # )
-    # total_savings = round(dr_agg['total_savings'] or 0, 2)
-    # total_co2     = round(dr_agg['total_co2']     or 0, 2)
+    dr_agg = DRResult.objects.aggregate(
+        total_savings=Sum('cost_saving_gbp'),
+        total_co2=Sum('carbon_reduced_kg'),
+    )
+    total_savings = round(dr_agg['total_savings'] or 0, 2)
+    total_co2     = round(dr_agg['total_co2']     or 0, 2)
 
     # ── Daily consumption — last 30 days ─────────────────────────
     thirty_days_ago = date.today() - timedelta(days=30)
@@ -53,10 +54,10 @@ def admin_dashboard(request):
     user_savings   = []
 
     for u in users:
-        # dr_data = DRResult.objects.filter(user=u).aggregate(
-        #     savings=Sum('cost_saving_gbp'),
-        #     co2=Sum('carbon_reduced_kg'),
-        # )
+        dr_data = DRResult.objects.filter(user=u).aggregate(
+            savings=Sum('cost_saving_gbp'),
+            co2=Sum('carbon_reduced_kg'),
+        )
         has_risk = PeakEvent.objects.filter(user=u, is_resolved=False).exists()
 
         user_summaries.append({
@@ -65,12 +66,12 @@ def admin_dashboard(request):
             'role':           u.role,
             'property_count': Property.objects.filter(owner=u).count(),
             'meter_count':    SmartMeter.objects.filter(property__owner=u).count(),
-            # 'total_savings':  round(dr_data['savings'] or 0, 2),
-            # 'total_co2':      round(dr_data['co2']     or 0, 2),
+            'total_savings':  round(dr_data['savings'] or 0, 2),
+            'total_co2':      round(dr_data['co2']     or 0, 2),
             'has_risk':       has_risk,
         })
         user_names.append(u.full_name or u.email.split('@')[0])
-        # user_savings.append(round(dr_data['savings'] or 0, 2))
+        user_savings.append(round(dr_data['savings'] or 0, 2))
 
     # ── Hourly average load ───────────────────────────────────────
     hourly_qs = (
@@ -96,9 +97,9 @@ def admin_dashboard(request):
         'total_users':       total_users,
         'total_meters':      total_meters,
         'total_properties':  total_properties,
-        # 'total_savings':     total_savings,
-        # 'total_co2':         total_co2,
-        # 'active_alerts':     active_alerts,
+        'total_savings':     total_savings,
+        'total_co2':         total_co2,
+        'active_alerts':     active_alerts,
 
         # Charts — serialized to JSON for Chart.js
         'daily_labels':      json.dumps(daily_labels),
@@ -115,4 +116,7 @@ def admin_dashboard(request):
         'recent_alerts':     recent_alerts,
     }
 
-    return render(request, 'admin/index.html', context)
+    # Importantly, include the default admin context (e.g. for the sidebar)
+    context.update(admin.site.each_context(request))
+
+    return render(request, 'admin/dashboard.html', context)
