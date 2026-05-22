@@ -329,6 +329,24 @@ UNFOLD = {
                     },
                 ],
             },
+
+            # TOKENS
+            {
+                "title": "JWT Tokens",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Outstanding Tokens",
+                        "icon": "vpn_key",
+                        "link": "/admin/token_blacklist/outstandingtoken/",
+                    },
+                    {
+                        "title": "Blacklisted Tokens",
+                        "icon": "block",
+                        "link": "/admin/token_blacklist/blacklistedtoken/",
+                    },
+                ],
+            },
         ],
     },
 }
